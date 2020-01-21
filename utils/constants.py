@@ -1,0 +1,1 @@
+RECOVERY_LINK_MAX_AGE = 600    # in seconds

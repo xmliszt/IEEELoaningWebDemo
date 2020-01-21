@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Loaning System</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <style>
+        #myInput, #Input-type {
+          font-size: 20px;
+          color: #4286f4;
+          padding: 12px 20px 12px 40px;
+          border: 1px solid #4286f4;
+          margin-bottom: 12px;
+        }
+
+        .header {
+            cursor: pointer;
+        }
+
+        .header:hover {
+            background-color: #cccccc
+        }
+
+        #myTable th, #myTable td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        #modal-table th, #modal-table td {
+            text-align: center;
+            padding: 5px;
+        }
+
+        #body_rows:hover {
+            background-color: #cccccc;
+        }
+
+        .tab_header:hover, .element:hover {
+            background-color: #4286f4;
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .item {
+            flex-basis: auto;
+        }
+
+        .search-bar {
+            width: 100%;
+            flex-grow: 1;
+            padding: 5px;
+        }
+
+    </style>
+</head>
+<body>
+    <center>
+        <div class="jumbotron">
+             <h1 style="color:#4286f4">Welcome {{name}}!</h1>
+             {% if admin == False %}
+                 <h4>You can only select one item to loan at a time. To loan multiple items, please click on submit and come back again. Each account can loan at most 5 items. Loan duration is 30 days. Please return the item before expiry! An email will be sent to you once you have loaned successfully!</h4>
+                 <button type="button" class="btn btn-warning" onclick="document.location.href='/loan/{{id}}'">View my loan record</button>
+             {% else %}
+                 <h4>Click on <b>view</b> to view all loaners record under the particular item. <br> To reset loaning status, please go to <b>Members Control</b></h4>
+             {% endif %}
+        </div>
+        <br>
+        <div class="container">
+            <div class="search-bar">
+                <input class="form-control" type="text" id="myInput" onkeyup="search()" placeholder="Search by name...">
+            </div>
+            <div class="search-bar">
+                <input class="form-control" type="text" id="Input-type" onkeyup="search_type()" placeholder="Search by type...">
+            </div>
+        </div>
+        <form method="POST">
+        <table cellpadding="5" style="width: 95%" id="myTable" class="fixed">
+            <thead>
+                <tr class="header" id="header" style="color: #3f3f3f">
+                    <th class="tab_header" onclick="sortTable(0)">ID</th>
+                    <th class="tab_header" onclick="sortTable(1)">NAME</th>
+                    <th class="tab_header" onclick="sortTable(2)">TYPE</th>
+                    <th class="tab_header" onclick="sortTable(3)">QUANTITY LEFT</th>
+                    <th class="tab_header" onclick="sortTable(4)">LOANABLE</th>
+                    {% if admin == False %}
+                        <th class="tab_header" onclick="sortTable(5)">CHOICE</th>
+                    {% else %}
+                        <th class="tab_header" onclick="sortTable(5)">LOANERS</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in inventory %}
+                <tr id="body_rows" style="color: #3f3f3f">
+                    <td class="element">{{item.id}}</td>
+                    <td class="element">
+                        <div class="container">
+                            <span class="item">{{item.name}}</span>
+                            {% if item.info == "" %}
+                            {% else %}
+                                <button type="button" class="btn btn-sm btn-info item" data-toggle="popover" title="{{item.name}}" data-content="{{item.info}}">!</button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    <td class="element">{{item.type}}</td>
+                    <td class="element">{{item.quantity}}</td>
+                    {% if item.is_allow == True %}
+                        <td class="element">Yes</td>
+                    {% else %}
+                        <td class="element">No</td>
+                    {% endif %}
+
+                    {% if admin == False %}
+                        {% if item.is_allow == False %}
+                            <td class="element"></td>
+                        {% elif item.quantity == 0%}
+                            <td class="element"></td>
+                        {% else %}
+                            <td class="element">
+                                 <input type="radio" name="select" value="{{item.id}}" class="form-check-input"> Pick me!
+                            </td>
+                        {% endif %}
+                    {% else %}
+                        <td class="element">
+                            <a class="btn btn-danger" href="/admin/inventory/{{item.id}}">View</a>
+                        </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+        <br>
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                 {% for message in messages %}
+                <div class="w-40 p-3" style="color: red">
+                    {{message}}
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <br>
+        <br>
+        {% if admin == False %}
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/login'">Back</button>
+        {% else %}
+            <button type="button" class="btn btn-primary" onclick="document.location.href='/admin'">Back</button>
+        {% endif %}
+        {% if admin == False %}
+            <button type="submit" class="btn btn-success">Submit</button>
+        {% else %}
+        {% endif %}
+        <br>
+        <br>
+        <a href="/logout">Logout</a>
+        </form>
+        <br>
+        <br>
+    </center>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script>
+        function search() {
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+
+        function search_type() {
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("Input-type");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2];
+            if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+    </script>
+    <script>
+        function sortTable(n) {
+          var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+          table = document.getElementById("myTable");
+          switching = true;
+          // Set the sorting direction to ascending:
+          dir = "asc";
+          /* Make a loop that will continue until
+          no switching has been done: */
+          while (switching) {
+            // Start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /* Loop through all table rows (except the
+            first, which contains table headers): */
+            for (i = 1; i < (rows.length - 1); i++) {
+              // Start by saying there should be no switching:
+              shouldSwitch = false;
+              /* Get the two elements you want to compare,
+              one from current row and one from the next: */
+              x = rows[i].getElementsByTagName("td")[n].innerHTML;
+              y = rows[i + 1].getElementsByTagName("td")[n].innerHTML;
+              /* Check if the two rows should switch place,
+              based on the direction, asc or desc: */
+              if (dir == "asc") {
+                if (isNaN(x) || isNaN(y)){
+                    if (x.toLowerCase() > y.toLowerCase()) {
+                      // If so, mark as a switch and break the loop:
+                      //alert('not number');
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+                else{
+                    x = parseInt(x);
+                    y = parseInt(y);
+                    // alert('is number');
+                    if (x>y) {
+                      // If so, mark as a switch and break the loop:
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+
+              } else if (dir == "desc") {
+                if (isNaN(x) || isNaN(y)){
+                   if (x.toLowerCase() < y.toLowerCase()) {
+                      // If so, mark as a switch and break the loop:
+                      // alert('not number');
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+                else{
+                    // alert('is number');
+                    x = parseInt(x);
+                    y = parseInt(y);
+                    if (x<y) {
+                      // If so, mark as a switch and break the loop:
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+              }
+            }
+            if (shouldSwitch) {
+              /* If a switch has been marked, make the switch
+              and mark that a switch has been done: */
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+              // Each time a switch is done, increase this count by 1:
+              switchcount ++;
+            } else {
+              /* If no switching has been done AND the direction is "asc",
+              set the direction to "desc" and run the while loop again. */
+              if (switchcount == 0 && dir == "asc") {
+                dir = "desc";
+                switching = true;
+              }
+            }
+          }
+        }
+    </script>
+    <script>
+        // popovers Initialization
+        $(function () {
+        $('[data-toggle="popover"]').popover({
+            container: 'body'
+            })
+        })
+    </script>
+</body>
+</html>

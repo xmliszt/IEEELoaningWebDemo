@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Member Signup</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+<br>
+<br>
+    <center>
+        <br>
+
+        <div class="container">
+            <h1 style="color: #4286f4">Register An Account</h1>
+        </div>
+        <form method="POST">
+          <div class="w-25 p-3 container" >
+              <div class="row">
+                  Student ID: <input type="text" class="form-control" id="student id" name="student_id" placeholder="SUTD Student ID">
+                  <small id="sutd" class="form-text text-muted">Input your SUTD Student ID here...</small>
+              </div>
+              <br>
+              <div class="row">
+                  IEEE Membership: <input type="text" class="form-control" id="membership" name="membership" placeholder="IEEE membership number">
+                  <small id="usrname" class="form-text text-muted">Input your IEEE membership number here...</small>
+              </div>
+              <br>
+              <div class="row">
+                   Password: <input type="password" class="form-control" id="password" name="password" placeholder="Your complicated password">
+              </div>
+              <br>
+
+              {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                  {% for message in messages %}
+                  <div class="w-40 p-3" style="color: red">
+                    {{message}}
+                  </div>
+                    <br>
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+
+              <button type="submit" class="btn btn-success">Sign Me Up</button>
+                <br>
+                <a href="/login">Back to login</a>
+                <br>
+                <br>
+              <a href="https://drive.google.com/open?id=1G62pv6kEH3oyEwuoAT_fqV-kP3P0uZ3A">Have yet to sign up as IEEE member?</a>
+                <br>
+              <a href="https://drive.google.com/open?id=1bp1Ot3N9lfKmNiJDCtYN81tEOGPPe_8n">Membership expired? Renew it now!</a>
+            </div>
+        </form>
+    </center>
+</body>
+</html>

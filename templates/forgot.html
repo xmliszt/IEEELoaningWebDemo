@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Forgot password</title>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+    <center>
+        <br>
+        <br>
+        <div class="container">
+            <h1 style="color: #4286f4">Forgot your password?</h1>
+            <h5>GIve us your student ID and email address and we'll send you a link to reset your password</h5>
+        </div>
+        <form method="POST">
+          <div class="w-25 p-3 container" >
+              <div class="row">
+                  Student ID: <input type="text" class="form-control" id="student_id" name="student_id" placeholder="SUTD Student ID">
+                  <small id="sutd" class="form-text text-muted">Input your SUTD Student ID here...</small>
+              </div>
+              <br>
+              <div class="row">
+                  Recovery Email: <input type="email" class="form-control" id="email" name="email" placeholder="Email address">
+              </div>
+              <br>
+              {% with messages = get_flashed_messages(with_categories=True) %}
+                {% if messages %}
+                  {% for message in messages %}
+                    {% if message[0] == "warn" %}
+                      <div class="w-40 p-3" style="color: #f44542">
+                        {{message[1]}}
+                      </div>
+                    {% elif message[0] == "success" %}
+                      <div class="w-40 p-3" style="color: green">
+                        {{message[1]}}
+                      </div>
+                    {% else %}
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              {% endwith %}
+              <br>
+              <button type="submit" class="btn btn-success">Recover</button>
+              <br>
+              <br>
+              <a href="/login">Back to login</a>
+              <br>
+            </div>
+        </form>
+    </center>
+</body>
+</html>

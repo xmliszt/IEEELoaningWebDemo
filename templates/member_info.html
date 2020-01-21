@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Member Information</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <style>
+        .jumbotron {
+            place-self: center;
+            width: 100%;
+            text-align: center
+        }
+
+        .item {
+            margin: 3px;
+            place-self: center;
+            flex-basis: auto;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-around;
+            width: 95%;
+        }
+
+        .container-2 {
+            display: flex;
+            justify-content: center;
+        }
+
+        .header {
+            cursor: pointer;
+        }
+
+        .header:hover {
+            background-color: #cccccc
+        }
+
+        #myTable th, #myTable td {
+            text-align: center;
+            padding: 12px;
+        }
+
+        #body_rows:hover {
+            background-color: #cccccc;
+        }
+
+        .tab_header:hover, .element:hover {
+            background-color: #4286f4;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-head">
+        <div class="jumbotron">
+            <h1 style="color:#4c8df7">{{name}}'s</h1>
+            <h3>Loan Record</h3>
+        </div>
+    </div>
+    <br>
+    <div class="container-2">
+      {% with messages = get_flashed_messages(with_categories=True) %}
+        {% if messages %}
+          {% for message in messages %}
+            {% if message[0] == "warn" %}
+              <div class="item" style="color: #f44542">
+                {{message[1]}}
+              </div>
+            {% elif message[0] == "success" %}
+              <div class="item" style="color: green">
+                {{message[1]}}
+              </div>
+            {% elif message[0] == "primary" %}
+              <div class="item" style="color: #2f7ce2">
+                {{message[1]}}
+              </div>
+            {% else %}
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+    </div>
+    <br>
+    <div class="container">
+        <form class="row" method="post" style="width:100%">
+            <input class="col-sm-12 form-control" type="text" id="myInput" onkeyup="search()" placeholder="Search by name...">
+        </form>
+    </div>
+    <div class="container">
+        <form method="POST" id="reset" style="width: 100%">
+            <table cellpadding="5" style="width: 100%" id="myTable" class="fixed">
+
+                <tr class="header" id="header" style="color: #3f3f3f">
+                    <th class="tab_header" onclick="sortTable(0)">ID</th>
+                    <th class="tab_header" onclick="sortTable(1)">ITEM NAME</th>
+                    <th class="tab_header" onclick="sortTable(2)">QUANTITY</th>
+                    <th class="tab_header" onclick="sortTable(3)">EXPIRY</th>
+                    <th class="tab_header" onclick="sortTable(3)">REMINDER</th>
+                    <th class="tab_header" >RETURN</th>
+                </tr>
+
+                {% for item in info %}
+                <tr id="body_rows" style="color: #3f3f3f">
+                    <td class="element">{{item.id}}</td>
+                    <td class="element">{{item.name}}</td>
+                    <td class="element">{{item.quantity}}</td>
+                    {% if expired == False %}
+                        <td class="element">{{item.expiry}}</td>
+                        <td class="element">
+                            <p>No need to remind</p>
+                        </td>
+                    {% else %}
+                        <td class="element" style="color: #f54242"><b>{{item.expiry}}</b></td>
+                        <td class="element">
+                            <button type="submit" class="btn btn-danger" name="remind" value="remind">Send Reminder</button>
+                        </td>
+                    {% endif %}
+                    <td class="element">
+                        <button type="submit" class="btn btn-warning" name="return_one" value="{{item.id}}">Return One</button>
+                        <button type="submit" class="btn btn-warning" name="return_all" value="{{item.id}}">Return All</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </form>
+    </div>
+    <br>
+    <div class="container-2">
+        <button type="button" class="btn btn-warning" onclick="document.location.href='/admin/members'" style="width: 10%">Back</button>
+    </div>
+    <br>
+    <br>
+<script>
+        function search() {
+          var input, filter, table, tr, td, i, txtValue;
+          input = document.getElementById("myInput");
+          filter = input.value.toUpperCase();
+          table = document.getElementById("myTable");
+          tr = table.getElementsByTagName("tr");
+
+          for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[1];
+            if (td) {
+              txtValue = td.textContent || td.innerText;
+              if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                tr[i].style.display = "";
+              } else {
+                tr[i].style.display = "none";
+              }
+            }
+          }
+        }
+</script>
+<script>
+        function sortTable(n) {
+          var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+          table = document.getElementById("myTable");
+          switching = true;
+          // Set the sorting direction to ascending:
+          dir = "asc";
+          /* Make a loop that will continue until
+          no switching has been done: */
+          while (switching) {
+            // Start by saying: no switching is done:
+            switching = false;
+            rows = table.rows;
+            /* Loop through all table rows (except the
+            first, which contains table headers): */
+            for (i = 1; i < (rows.length - 1); i++) {
+              // Start by saying there should be no switching:
+              shouldSwitch = false;
+              /* Get the two elements you want to compare,
+              one from current row and one from the next: */
+              x = rows[i].getElementsByTagName("td")[n].innerHTML;
+              y = rows[i + 1].getElementsByTagName("td")[n].innerHTML;
+              /* Check if the two rows should switch place,
+              based on the direction, asc or desc: */
+              if (dir == "asc") {
+                if (isNaN(x) || isNaN(y)){
+                    if (x.toLowerCase() > y.toLowerCase()) {
+                      // If so, mark as a switch and break the loop:
+                      //alert('not number');
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+                else{
+                    x = parseInt(x);
+                    y = parseInt(y);
+                    // alert('is number');
+                    if (x>y) {
+                      // If so, mark as a switch and break the loop:
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+
+              } else if (dir == "desc") {
+                if (isNaN(x) || isNaN(y)){
+                   if (x.toLowerCase() < y.toLowerCase()) {
+                      // If so, mark as a switch and break the loop:
+                      // alert('not number');
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+                else{
+                    // alert('is number');
+                    x = parseInt(x);
+                    y = parseInt(y);
+                    if (x<y) {
+                      // If so, mark as a switch and break the loop:
+                      shouldSwitch = true;
+                      break;
+                    }
+                }
+              }
+            }
+            if (shouldSwitch) {
+              /* If a switch has been marked, make the switch
+              and mark that a switch has been done: */
+              rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+              switching = true;
+              // Each time a switch is done, increase this count by 1:
+              switchcount ++;
+            } else {
+              /* If no switching has been done AND the direction is "asc",
+              set the direction to "desc" and run the while loop again. */
+              if (switchcount == 0 && dir == "asc") {
+                dir = "desc";
+                switching = true;
+              }
+            }
+          }
+        }
+    </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</body>
+</html>
